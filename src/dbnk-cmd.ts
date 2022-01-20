@@ -1,22 +1,40 @@
 import { DbnkCtx, DbnkCtxPart } from "./dbnk-ctx";
+import { promisify } from "util";
+import { exec } from "child_process";
+
+const execPromise = promisify(exec);
 
 export class DbnkCmd {
-  private constructor(private readonly _cmd: string) {}
+  private constructor(
+    private readonly _cmd: string,
+    private readonly _cmdFinal: string
+  ) {}
 
   //
   // Factory Methods
   //
-  public static fromCtxPath(ctx: DbnkCtx, ctxPath: string) {
+  public static fromCtxPath(
+    ctx: DbnkCtx,
+    ctxPath: string,
+    cmdFinal: string = ""
+  ): DbnkCmd {
     const ctxPathArr = ctxPath.split(".");
     const ctxPathNextPart = ctxPathArr.shift();
-    return DbnkCmd.fromCtxPartAndPathArr(ctx[ctxPathNextPart], ctxPathArr);
+    return DbnkCmd.fromCtxPartAndPathArr(
+      ctx[ctxPathNextPart],
+      ctxPathArr,
+      "",
+      {},
+      cmdFinal
+    );
   }
 
   private static fromCtxPartAndPathArr(
     ctx: DbnkCtxPart,
     ctxPathArr: string[],
-    cumulativeCmd: string = "",
-    cumulativeVar: { [key: string]: string } = {}
+    cumulativeCmd: string,
+    cumulativeVar: { [key: string]: string },
+    cmdFinal: string
   ) {
     if (ctx.cmd === undefined) throw new Error("no cmd");
 
@@ -46,7 +64,7 @@ export class DbnkCmd {
         }
       }
 
-      return new DbnkCmd(finalCtxCmdWithResolvedVars);
+      return new DbnkCmd(finalCtxCmdWithResolvedVars, cmdFinal);
     }
 
     const ctxPathNextPart = ctxPathArr.shift();
@@ -58,7 +76,8 @@ export class DbnkCmd {
       ctx.ctx[ctxPathNextPart],
       ctxPathArr,
       finalCtxCmd,
-      finalCtxVar
+      finalCtxVar,
+      cmdFinal
     );
   }
 
@@ -66,6 +85,10 @@ export class DbnkCmd {
   // Utility Methods
   //
   toString() {
-    return this._cmd;
+    return `${this._cmd}${this._cmdFinal}`;
+  }
+
+  exec() {
+    return execPromise(this.toString());
   }
 }

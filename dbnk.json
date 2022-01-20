@@ -1,9 +1,0 @@
-{
-    "local": {
-        "_bin": "ls $(some)",
-        "__some": "1111",
-        "docker": {
-            "bin": " && echo 'hello-world'"
-        }
-    }
-}

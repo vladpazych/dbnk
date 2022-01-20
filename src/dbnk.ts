@@ -38,7 +38,7 @@ export class Dbnk {
       if (typeof value["var"] == "object") {
         for (const varValue of Object.values(value["var"])) {
           if (typeof varValue !== "string") {
-            throw new Error("VarValueMustBeString")
+            throw new Error("VarValueMustBeString");
           }
         }
       }
@@ -52,7 +52,7 @@ export class Dbnk {
   //
   info() {}
 
-  cmd(ctxPath: string) {
-    return DbnkCmd.fromCtxPath(this.ctx, ctxPath);
+  cmd(ctxPath: string, cmd: string = "") {
+    return DbnkCmd.fromCtxPath(this.ctx, ctxPath, cmd);
   }
 }

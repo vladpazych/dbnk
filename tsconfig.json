@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "rootDir": ".",
     "outDir": "dist",
     "module": "commonjs",

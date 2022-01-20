@@ -36,6 +36,12 @@ class DbnkCmdTests extends DbnkTests {
     this.SUT.cmd("c1.c2.c3").toString().should.be.equal("one two three");
   }
 
+  @test "should create cumulative cmd with final piece"() {
+    this.SUT.cmd("c1.c2.c3", " final")
+      .toString()
+      .should.be.equal("one two three final");
+  }
+
   @test "should throw 'CtxDoesNotExistOnPath'"() {
     (() => {
       this.SUT.cmd("c1.c4.c3");
@@ -135,7 +141,7 @@ class DbnkCmdVariableTests extends DbnkTests {
         c1: {
           var: {
             foo: "twoFoo",
-            bar: "otherBar" // Should not override because it's lower in hierarchy
+            bar: "otherBar", // Should not override because it's lower in hierarchy
           },
         },
       },
