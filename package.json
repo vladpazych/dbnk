@@ -1,0 +1,43 @@
+{
+  "name": "dbnk",
+  "version": "0.1.0",
+  "description": "Straightforward tool for executing commands in predefined contexts.",
+  "keywords": [
+    "bin",
+    "context",
+    "cli"
+  ],
+  "author": "Vlad Pazych <vladpazych@gmail.com>",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "bin": "./dist/cli.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "bundle": "npm run build && pkg . --out-dir ./exec/",
+    "clean": "rimraf ./dist/ ./exec/",
+    "cli": "ts-node ./src/cli.ts",
+    "test": "nyc ./node_modules/.bin/_mocha 'test/**/*.test.ts'",
+    "test:watch": "mocha --reporter min --watch-extensions 'js,ts' --watch --watch-files 'test/**/*.ts,src/**/*.ts' 'test/**/*.test.ts'"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@testdeck/mocha": "^0.2.0",
+    "@types/chai": "^4.3.0",
+    "chai": "^4.3.4",
+    "mocha": "^9.1.4",
+    "nyc": "^15.1.0",
+    "ts-mockito": "^2.6.1",
+    "tsconfig-paths": "^3.12.0",
+    "pkg": "^4.4.0",
+    "rimraf": "^2.6.3",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "commander": "^8.3.0",
+    "minimal-cli-parser": "^0.1.0"
+  }
+}
