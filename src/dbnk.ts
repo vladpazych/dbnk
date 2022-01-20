@@ -14,22 +14,38 @@ export class Dbnk {
   // Factory Methods
   //
   public static fromCtx(...ctx: DbnkCtx[]) {
-    return new Dbnk(merge({}, ...ctx));
+    return new Dbnk(this.validateCtx(merge({}, ...ctx)));
   }
 
-  // private static validateContext(rawContext: {}) {
-  //   for (const [key, value] of Object.entries(rawContext)) {
-  //     if (typeof key !== "string") return false;
-  //     if (
-  //       typeof value["contexts"] !== undefined &&
-  //       typeof value["contexts"] !== "object"
-  //     )
-  //       return false;
-  //     if (typeof value["contexts"] === "object")
-  //       return this.validateContext(value["contexts"]);
-  //   }
-  //   return rawContext as DbnkContexts;
-  // }
+  private static validateCtx(rawContext: {}) {
+    for (const value of Object.values(rawContext)) {
+      if (value["cmd"] === undefined) {
+        throw new Error("CmdDoesNotExistOnCtx");
+      }
+
+      if (value["ctx"] !== undefined && typeof value["ctx"] !== "object") {
+        throw new Error("CtxIsNotObjectOrUndefined");
+      }
+
+      if (typeof value["ctx"] === "object") {
+        this.validateCtx(value["ctx"]);
+      }
+
+      if (value["var"] !== undefined && typeof value["var"] !== "object") {
+        throw new Error("VarMustBeObject");
+      }
+
+      if (typeof value["var"] == "object") {
+        for (const varValue of Object.values(value["var"])) {
+          if (typeof varValue !== "string") {
+            throw new Error("VarValueMustBeString")
+          }
+        }
+      }
+    }
+
+    return rawContext as DbnkCtx;
+  }
 
   //
   // Public Methods
@@ -37,6 +53,6 @@ export class Dbnk {
   info() {}
 
   cmd(ctxPath: string) {
-    return DbnkCmd.fromCtxPath(this.ctx, ctxPath).cmd;
+    return DbnkCmd.fromCtxPath(this.ctx, ctxPath);
   }
 }

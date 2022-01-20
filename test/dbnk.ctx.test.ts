@@ -22,16 +22,16 @@ class DbnkFromValidContextsTests extends DbnkTests {
     this.SUT = Dbnk.fromCtx(...validContexts);
   }
 
-  @test "dbnk should have overriden passed context"() {
+  @test "should have overriden passed context"() {
     this.SUT.ctx.local.cmd.should.be.equal("prefixOverriden");
   }
 
-  @test "dbnk passed context should be a deep copy"() {
+  @test "passed context should be a deep copy"() {
     this.SUT.ctx.local.cmd = "prefix2";
     this.SUT.ctx.local.cmd.should.be.equal("prefixOverriden");
   }
 
-  @test "dbnk passed context should be created from multiple entries"() {
+  @test "passed context should be created from multiple entries"() {
     this.SUT.ctx.local2.cmd.should.be.equal("prefix2");
   }
 }
@@ -61,21 +61,88 @@ class DbnkFromNestedValidContextsTests extends DbnkTests {
     this.SUT = Dbnk.fromCtx(...validContexts);
   }
 
-  @test "dbnk should have cumulative overriden passed context"() {
+  @test "should have cumulative overriden passed context"() {
     this.SUT.ctx.local.cmd.should.be.equal("prefixOverriden");
-    this.SUT.ctx.local.ctx.nested.cmd.should.be.equal(
-      " second prefix"
-    );
+    this.SUT.ctx.local.ctx.nested.cmd.should.be.equal(" second prefix");
     this.SUT.ctx.local.var.foo.should.be.equal("bar");
     this.SUT.ctx.local.var.bar.should.be.equal("foo");
   }
 
-  @test "dbnk passed context should be a deep copy"() {
+  @test "passed context should be a deep copy"() {
     this.SUT.ctx.local.cmd = "prefix2";
     this.SUT.ctx.local.cmd.should.be.equal("prefixOverriden");
   }
 
-  @test "dbnk passed context should be created from multiple entries"() {
+  @test "passed context should be created from multiple entries"() {
     this.SUT.ctx.local2.cmd.should.be.equal("prefix2");
+  }
+}
+
+@suite
+class DbnkFromInvalidContextsTests extends DbnkTests {
+  @test "should throw 'CmdDoesNotExistOnCtx'"() {
+    const invalidContexts: DbnkCtx[] = [
+      {
+        local: {
+          ctx: {
+            nested: {
+              cmd: "second",
+            },
+          },
+        },
+      },
+    ];
+
+    (() => {
+      this.SUT = Dbnk.fromCtx(...invalidContexts);
+    }).should.throw(Error, "CmdDoesNotExistOnCtx");
+  }
+
+  @test "should throw 'CtxIsNotObjectOrUndefined'"() {
+    const invalidContexts: DbnkCtx[] = [
+      {
+        local: {
+          cmd: "first",
+          ctx: 3 as {}
+        },
+      },
+    ];
+
+    (() => {
+      this.SUT = Dbnk.fromCtx(...invalidContexts);
+    }).should.throw(Error, "CtxIsNotObjectOrUndefined");
+  }
+
+  @test "should throw 'VarMustBeObject'"() {
+    const invalidContexts: DbnkCtx[] = [
+      {
+        local: {
+          cmd: "first",
+          var: "hello" as {}
+        },
+      },
+    ];
+
+    (() => {
+      this.SUT = Dbnk.fromCtx(...invalidContexts);
+    }).should.throw(Error, "VarMustBeObject");
+  }
+  
+  @test "should throw 'VarValueMustBeString'"() {
+    const invalidContexts: DbnkCtx[] = [
+      {
+        local: {
+          cmd: "first",
+          var: {
+            foo: 'some',
+            bar: {} as string,
+          }
+        },
+      },
+    ];
+
+    (() => {
+      this.SUT = Dbnk.fromCtx(...invalidContexts);
+    }).should.throw(Error, "VarValueMustBeString");
   }
 }

@@ -1,10 +1,6 @@
 import { DbnkCtx, DbnkCtxPart } from "./dbnk-ctx";
 
 export class DbnkCmd {
-  get cmd() {
-    return this._cmd;
-  }
-
   private constructor(private readonly _cmd: string) {}
 
   //
@@ -19,25 +15,57 @@ export class DbnkCmd {
   private static fromCtxPartAndPathArr(
     ctx: DbnkCtxPart,
     ctxPathArr: string[],
-    cumulativeCmd: string = ""
+    cumulativeCmd: string = "",
+    cumulativeVar: { [key: string]: string } = {}
   ) {
     if (ctx.cmd === undefined) throw new Error("no cmd");
 
-    let currentCmd = ctx.cmd;
-    // TODO: Resolve variables
-    // Throw if no variable
+    const currentCmd = ctx.cmd || "";
+    const currentVar = ctx.var || {};
 
-    const finalCtxCmd = `${cumulativeCmd}${currentCmd}`
+    const finalCtxCmd = `${cumulativeCmd}${currentCmd}`;
+    const finalCtxVar = { ...cumulativeVar, ...currentVar };
 
-    if (ctxPathArr.length === 0) return new DbnkCmd(finalCtxCmd);
+    if (ctxPathArr.length === 0) {
+      let finalCtxCmdWithResolvedVars = finalCtxCmd;
+      const varOccurances = finalCtxCmd.match(/\$\(\w*\)/g);
+
+      if (varOccurances) {
+        for (const varOccurance of varOccurances) {
+          const varKey = varOccurance.replace(/[\$()]/g, "");
+          const varReplacer = finalCtxVar[varKey];
+
+          if (varReplacer === undefined) {
+            throw new Error(`UnknownVarUsage: ${varKey}`);
+          }
+
+          finalCtxCmdWithResolvedVars = finalCtxCmdWithResolvedVars.replace(
+            varOccurance,
+            varReplacer
+          );
+        }
+      }
+
+      return new DbnkCmd(finalCtxCmdWithResolvedVars);
+    }
 
     const ctxPathNextPart = ctxPathArr.shift();
-    if (ctx.ctx[ctxPathNextPart] === undefined) throw new Error(`ctx on path doesn't exist`);
+    if (ctx.ctx === undefined || ctx.ctx[ctxPathNextPart] === undefined) {
+      throw new Error(`CtxDoesNotExistOnPath`);
+    }
 
     return DbnkCmd.fromCtxPartAndPathArr(
       ctx.ctx[ctxPathNextPart],
       ctxPathArr,
-      finalCtxCmd
+      finalCtxCmd,
+      finalCtxVar
     );
+  }
+
+  //
+  // Utility Methods
+  //
+  toString() {
+    return this._cmd;
   }
 }
