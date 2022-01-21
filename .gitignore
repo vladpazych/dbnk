@@ -64,3 +64,6 @@ typings/
 
 # Build output
 dist
+
+# Dbnk
+.dbnk.json
