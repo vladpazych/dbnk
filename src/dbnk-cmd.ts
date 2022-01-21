@@ -46,11 +46,11 @@ export class DbnkCmd {
 
     if (ctxPathArr.length === 0) {
       let finalCtxCmdWithResolvedVars = finalCtxCmd;
-      const varOccurances = finalCtxCmd.match(/\$\(\w*\)/g);
+      const varOccurances = finalCtxCmd.match(/\$\[\w*\]/g);
 
       if (varOccurances) {
         for (const varOccurance of varOccurances) {
-          const varKey = varOccurance.replace(/[\$()]/g, "");
+          const varKey = varOccurance.replace(/[\$\[\]]/g, "");
           const varReplacer = finalCtxVar[varKey];
 
           if (varReplacer === undefined) {

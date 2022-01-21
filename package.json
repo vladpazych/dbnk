@@ -1,6 +1,6 @@
 {
   "name": "dbnk",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Straightforward tool for executing commands in predefined contexts.",
   "keywords": [
     "bin",
@@ -16,7 +16,7 @@
     "dist/**/*"
   ],
   "scripts": {
-    "build": "npm run clean && tsc --declaration",
+    "build": "npm run clean && tsc",
     "bundle": "npm run build && pkg . --out-dir ./exec/",
     "clean": "rimraf ./dist/ ./exec/",
     "cli": "ts-node ./src/dbnk-cli.ts",

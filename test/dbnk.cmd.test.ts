@@ -58,7 +58,7 @@ class DbnkCmdVariableTests extends DbnkTests {
   @test "should resolve variable"() {
     const validContexts: DbnkCtx = {
       c1: {
-        cmd: "one $(foo)",
+        cmd: "one $[foo]",
         var: {
           foo: "oneFoo",
         },
@@ -77,7 +77,7 @@ class DbnkCmdVariableTests extends DbnkTests {
   @test "should resolve multiple variables"() {
     const validContexts: DbnkCtx = {
       c1: {
-        cmd: "one $(foo) $(foo) $(bar)",
+        cmd: "one $[foo] $[foo] $[bar]",
         var: {
           foo: "oneFoo",
         },
@@ -99,7 +99,7 @@ class DbnkCmdVariableTests extends DbnkTests {
   @test "should resolve variables overriden by ctx child"() {
     const validContexts: DbnkCtx = {
       c1: {
-        cmd: "one $(foo) $(foo) $(bar)",
+        cmd: "one $[foo] $[foo] $[bar]",
         var: {
           foo: "oneFoo",
         },
@@ -123,7 +123,7 @@ class DbnkCmdVariableTests extends DbnkTests {
     const validContexts: DbnkCtx[] = [
       {
         c1: {
-          cmd: "one $(foo) $(foo) $(bar)",
+          cmd: "one $[foo] $[foo] $[bar]",
           var: {
             foo: "oneFoo",
           },

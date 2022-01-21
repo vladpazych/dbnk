@@ -6,7 +6,8 @@
     "module": "commonjs",
     "target": "es6",
     "lib": ["es2017", "dom"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "declaration": true
   },
   "exclude": ["test/**/*.ts"]
 }
