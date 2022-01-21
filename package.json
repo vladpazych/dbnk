@@ -1,6 +1,6 @@
 {
   "name": "dbnk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Straightforward tool for executing commands in predefined contexts.",
   "keywords": [
     "bin",
@@ -10,12 +10,13 @@
   "author": "Vlad Pazych <vladpazych@gmail.com>",
   "license": "MIT",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bin": "./dist/dbnk-cli.js",
   "files": [
     "dist/**/*"
   ],
   "scripts": {
-    "build": "npm run clean && tsc",
+    "build": "npm run clean && tsc --declaration",
     "bundle": "npm run build && pkg . --out-dir ./exec/",
     "clean": "rimraf ./dist/ ./exec/",
     "cli": "ts-node ./src/dbnk-cli.ts",
