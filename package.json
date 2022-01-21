@@ -10,7 +10,7 @@
   "author": "Vlad Pazych <vladpazych@gmail.com>",
   "license": "MIT",
   "main": "./dist/index.js",
-  "bin": "./dist/cli.js",
+  "bin": "./dist/dbnk-cli.js",
   "files": [
     "dist/**/*"
   ],
