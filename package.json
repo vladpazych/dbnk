@@ -9,8 +9,8 @@
   ],
   "author": "Vlad Pazych <vladpazych@gmail.com>",
   "license": "MIT",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/dbnk.js",
+  "types": "./dist/dbnk.d.ts",
   "bin": "./dist/dbnk-cli.js",
   "files": [
     "dist/**/*"
