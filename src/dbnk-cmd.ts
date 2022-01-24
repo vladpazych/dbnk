@@ -5,10 +5,7 @@ import { exec } from "child_process";
 const execPromise = promisify(exec);
 
 export class DbnkCmd {
-  private constructor(
-    private readonly _cmd: string,
-    private readonly _cmdFinal: string
-  ) {}
+  private constructor(private readonly _cmd: string) {}
 
   //
   // Factory Methods
@@ -23,7 +20,8 @@ export class DbnkCmd {
 
     const resolvedCmd = DbnkCmd.finalCmdFromCtxPartAndPathArr(
       ctx[ctxPathNextPart],
-      ctxPathArr
+      ctxPathArr,
+      cmdFinal
     );
 
     // Resolve vars in the final Cmd
@@ -41,21 +39,24 @@ export class DbnkCmd {
       }
     }
 
-    return new DbnkCmd(resolvedCmd.cmd, cmdFinal);
+    return new DbnkCmd(resolvedCmd.cmd);
   }
 
   private static finalCmdFromCtxPartAndPathArr(
     ctxPart: DbnkCtxPart,
-    ctxPathArr: string[]
+    ctxPathArr: string[],
+    lastCmd: string = ""
   ): DbnkCtxPart {
     let currentCmd = ctxPart.cmd || "";
     let currentVar = ctxPart.var || {};
 
+    // Add default portal if it's not present
+    if (currentCmd.indexOf("$<>") === -1) {
+      currentCmd = `${currentCmd}$<>`;
+    }
+
     if (ctxPathArr.length === 0) {
-      // If portal is present on the deepest level, we have to remove it
-      if (currentCmd.indexOf("$<>") === -1) {
-        currentCmd = currentCmd.replace("$<>", "");
-      }
+      currentCmd = currentCmd.replace("$<>", lastCmd);
 
       return {
         cmd: currentCmd,
@@ -71,13 +72,9 @@ export class DbnkCmd {
 
     const nestedCtxResolved = DbnkCmd.finalCmdFromCtxPartAndPathArr(
       ctxPart.ctx[nestedCtxPath],
-      ctxPathArr
+      ctxPathArr,
+      lastCmd
     );
-
-    // Add default portal if it's not present
-    if (currentCmd.indexOf("$<>") === -1) {
-      currentCmd = `${currentCmd}$<>`;
-    }
 
     const finalCmd = currentCmd.replace("$<>", nestedCtxResolved.cmd);
     const finalVar = { ...currentVar, ...nestedCtxResolved.var };
@@ -88,68 +85,11 @@ export class DbnkCmd {
     };
   }
 
-  private static fromCtxPartAndPathArr(
-    ctx: DbnkCtxPart,
-    ctxPathArr: string[],
-    cumulativeCmd: string,
-    cumulativeVar: { [key: string]: string },
-    cmdFinal: string
-  ) {
-    if (ctx.cmd === undefined) throw new Error("no cmd");
-
-    const currentCmd = ctx.cmd || "";
-    const currentVar = ctx.var || {};
-
-    let finalCtxCmd = `${cumulativeCmd}${currentCmd}`;
-
-    if (cumulativeCmd.indexOf("$<>") !== -1) {
-      finalCtxCmd = cumulativeCmd.replace("$<>", currentCmd);
-    }
-
-    const finalCtxVar = { ...cumulativeVar, ...currentVar };
-
-    if (ctxPathArr.length === 0) {
-      let finalCtxCmdWithResolvedVars = finalCtxCmd;
-      const varOccurances = finalCtxCmd.match(/\$\[\w*\]/g);
-
-      if (varOccurances) {
-        for (const varOccurance of varOccurances) {
-          const varKey = varOccurance.replace(/[\$\[\]]/g, "");
-          const varReplacer = finalCtxVar[varKey];
-
-          if (varReplacer === undefined) {
-            throw new Error(`UnknownVarUsage: ${varKey}`);
-          }
-
-          finalCtxCmdWithResolvedVars = finalCtxCmdWithResolvedVars.replace(
-            varOccurance,
-            varReplacer
-          );
-        }
-      }
-
-      return new DbnkCmd(finalCtxCmdWithResolvedVars, cmdFinal);
-    }
-
-    const ctxPathNextPart = ctxPathArr.shift();
-    if (ctx.ctx === undefined || ctx.ctx[ctxPathNextPart] === undefined) {
-      throw new Error(`CtxDoesNotExistOnPath`);
-    }
-
-    return DbnkCmd.fromCtxPartAndPathArr(
-      ctx.ctx[ctxPathNextPart],
-      ctxPathArr,
-      finalCtxCmd,
-      finalCtxVar,
-      cmdFinal
-    );
-  }
-
   //
   // Utility Methods
   //
   toString() {
-    return `${this._cmd}${this._cmdFinal}`;
+    return `${this._cmd}`;
   }
 
   exec() {

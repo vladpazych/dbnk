@@ -175,7 +175,9 @@ class DbnkCmdPortalTests extends DbnkTests {
   }
 
   @test "should put nested cmd to portal"() {
-    this.SUT.cmd("c1.c2.c3").toString().should.be.equal("start two three finish");
+    this.SUT.cmd("c1.c2.c3")
+      .toString()
+      .should.be.equal("start two three finish");
   }
 }
 
@@ -186,7 +188,7 @@ class DbnkCmdPortalWithVarsTests extends DbnkTests {
       c1: {
         cmd: "start $<> $[foo] finish",
         var: {
-          bar: 'bar'
+          bar: "bar",
         },
         ctx: {
           c2: {
@@ -195,8 +197,8 @@ class DbnkCmdPortalWithVarsTests extends DbnkTests {
               c3: {
                 cmd: " three $[bar]",
                 var: {
-                  foo: 'foo'
-                }
+                  foo: "foo",
+                },
               },
             },
           },
@@ -208,7 +210,9 @@ class DbnkCmdPortalWithVarsTests extends DbnkTests {
   }
 
   @test "should put nested cmd to portal and resolve nested vars"() {
-    this.SUT.cmd("c1.c2.c3").toString().should.be.equal("start two three bar foo finish");
+    this.SUT.cmd("c1.c2.c3")
+      .toString()
+      .should.be.equal("start two three bar foo finish");
   }
 }
 
@@ -219,17 +223,17 @@ class DbnkCmdNestedPortalWithVarsTests extends DbnkTests {
       c1: {
         cmd: "start $<> $[foo] finish",
         var: {
-          bar: 'bar'
+          bar: "bar",
         },
         ctx: {
           c2: {
             cmd: "$<> two",
+            var: {
+              foo: "foo",
+            },
             ctx: {
               c3: {
                 cmd: "three $[bar]",
-                var: {
-                  foo: 'foo'
-                }
               },
             },
           },
@@ -241,6 +245,14 @@ class DbnkCmdNestedPortalWithVarsTests extends DbnkTests {
   }
 
   @test "should put nested cmd to nested portal and resolve nested vars"() {
-    this.SUT.cmd("c1.c2.c3").toString().should.be.equal("start three bar two foo finish");
+    this.SUT.cmd("c1.c2.c3")
+      .toString()
+      .should.be.equal("start three bar two foo finish");
+    this.SUT.cmd("c1.c2.c3", " hello")
+      .toString()
+      .should.be.equal("start three bar hello two foo finish");
+    this.SUT.cmd("c1.c2", "hello")
+      .toString()
+      .should.be.equal("start hello two foo finish");
   }
 }
