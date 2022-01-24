@@ -151,3 +151,96 @@ class DbnkCmdVariableTests extends DbnkTests {
     SUT.cmd("c1.c2").toString().should.be.equal("one twoFoo twoFoo twoBar two");
   }
 }
+
+@suite
+class DbnkCmdPortalTests extends DbnkTests {
+  before() {
+    const validContexts: DbnkCtx = {
+      c1: {
+        cmd: "start $<> finish",
+        ctx: {
+          c2: {
+            cmd: "two",
+            ctx: {
+              c3: {
+                cmd: " three",
+              },
+            },
+          },
+        },
+      },
+    };
+
+    this.SUT = Dbnk.fromCtx(validContexts);
+  }
+
+  @test "should put nested cmd to portal"() {
+    this.SUT.cmd("c1.c2.c3").toString().should.be.equal("start two three finish");
+  }
+}
+
+@suite
+class DbnkCmdPortalWithVarsTests extends DbnkTests {
+  before() {
+    const validContexts: DbnkCtx = {
+      c1: {
+        cmd: "start $<> $[foo] finish",
+        var: {
+          bar: 'bar'
+        },
+        ctx: {
+          c2: {
+            cmd: "two",
+            ctx: {
+              c3: {
+                cmd: " three $[bar]",
+                var: {
+                  foo: 'foo'
+                }
+              },
+            },
+          },
+        },
+      },
+    };
+
+    this.SUT = Dbnk.fromCtx(validContexts);
+  }
+
+  @test "should put nested cmd to portal and resolve nested vars"() {
+    this.SUT.cmd("c1.c2.c3").toString().should.be.equal("start two three bar foo finish");
+  }
+}
+
+@suite
+class DbnkCmdNestedPortalWithVarsTests extends DbnkTests {
+  before() {
+    const validContexts: DbnkCtx = {
+      c1: {
+        cmd: "start $<> $[foo] finish",
+        var: {
+          bar: 'bar'
+        },
+        ctx: {
+          c2: {
+            cmd: "$<> two",
+            ctx: {
+              c3: {
+                cmd: "three $[bar]",
+                var: {
+                  foo: 'foo'
+                }
+              },
+            },
+          },
+        },
+      },
+    };
+
+    this.SUT = Dbnk.fromCtx(validContexts);
+  }
+
+  @test "should put nested cmd to nested portal and resolve nested vars"() {
+    this.SUT.cmd("c1.c2.c3").toString().should.be.equal("start three bar two foo finish");
+  }
+}
