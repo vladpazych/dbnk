@@ -80,24 +80,6 @@ class DbnkFromNestedValidContextsTests extends DbnkTests {
 
 @suite
 class DbnkFromInvalidContextsTests extends DbnkTests {
-  @test "should throw 'CmdDoesNotExistOnCtx'"() {
-    const invalidContexts: DbnkCtx[] = [
-      {
-        local: {
-          ctx: {
-            nested: {
-              cmd: "second",
-            },
-          },
-        },
-      },
-    ];
-
-    (() => {
-      this.SUT = Dbnk.fromCtx(...invalidContexts);
-    }).should.throw(Error, "CmdDoesNotExistOnCtx");
-  }
-
   @test "should throw 'CtxIsNotObjectOrUndefined'"() {
     const invalidContexts: DbnkCtx[] = [
       {

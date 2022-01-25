@@ -19,10 +19,6 @@ export class Dbnk {
 
   private static validateCtx(rawContext: {}) {
     for (const value of Object.values(rawContext)) {
-      if (value["cmd"] === undefined) {
-        throw new Error("CmdDoesNotExistOnCtx");
-      }
-
       if (value["ctx"] !== undefined && typeof value["ctx"] !== "object") {
         throw new Error("CtxIsNotObjectOrUndefined");
       }

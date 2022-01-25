@@ -256,3 +256,41 @@ class DbnkCmdNestedPortalWithVarsTests extends DbnkTests {
       .should.be.equal("start hello two foo finish");
   }
 }
+
+@suite
+class DbnkCmdFinalWordTests extends DbnkTests {
+  before() {
+    const validContexts: DbnkCtx = {
+      c1: {
+        cmd: "$[command] $<>",
+        ctx: {
+          c2: {
+            ctx: {
+              run: {
+                var: {
+                  command: "run",
+                },
+              },
+              copy: {
+                var: {
+                  command: "copy",
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    this.SUT = Dbnk.fromCtx(validContexts);
+  }
+
+  @test "should put nested cmd to nested portal and resolve nested vars"() {
+    this.SUT.cmd("c1.c2.run", "command")
+      .toString()
+      .should.be.equal("run command");
+    this.SUT.cmd("c1.c2.copy", "command")
+      .toString()
+      .should.be.equal("copy command");
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "dbnk",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Straightforward tool for executing commands in predefined contexts.",
   "keywords": [
     "bin",
